@@ -1,0 +1,14 @@
+{
+  "chat_url": "",
+  "bg_opacity": 79,
+  "geometry": {
+    "x": 60,
+    "y": 60,
+    "w": 420,
+    "h": 680
+  },
+  "font_size": 14,
+  "text_outline": false,
+  "hide_avatars": false,
+  "highlight_words": ""
+}
