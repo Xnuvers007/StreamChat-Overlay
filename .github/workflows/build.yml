@@ -1,0 +1,45 @@
+name: Build EXE
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Setup UPX
+      uses: crazy-max/ghaction-upx@v3
+      with:
+        version: latest
+        install-only: true
+
+    - name: Install Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install PySide6 pyinstaller pyinstaller-hooks-contrib --no-cache-dir
+
+    - name: Build EXE with PyInstaller
+      # Baris perintah dijadikan satu untuk menghindari masalah parsing argumen di PowerShell Windows.
+      # Ditambahkan pengecualian file Qt untuk mencegah crash saat aplikasi dibuka.
+      run: pyinstaller --clean --noconfirm --noconsole --onedir --upx-exclude="Qt*.dll" --name "StreamChatOverlay" stream-chat.py
+
+    - name: Zip output folder
+      run: |
+        Compress-Archive -Path dist\StreamChatOverlay -DestinationPath dist\StreamChatOverlay-windows.zip
+
+    - name: Upload Release Asset
+      uses: softprops/action-gh-release@v2
+      with:
+        files: dist/StreamChatOverlay-windows.zip
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
